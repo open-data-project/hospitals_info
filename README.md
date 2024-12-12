@@ -15,7 +15,7 @@
 
 ```sql
 CREATE TABLE hospitals (
-    encrypted_code VARCHAR(100) PRIMARY KEY,       -- 병원의 고유 ID (암호화요양기호)
+    encrypted_code VARCHAR(255) PRIMARY KEY,       -- 병원의 고유 ID (암호화요양기호)
     name VARCHAR(255) NOT NULL,                  -- 병원 이름
     address TEXT NOT NULL,                       -- 병원의 상세 주소
     phone_number VARCHAR(50),                    -- 병원의 전화번호
@@ -46,8 +46,10 @@ CREATE TABLE regions (
     province_name VARCHAR(100) NOT NULL,         -- 시/도 이름
     city_code VARCHAR(10) NOT NULL,              -- 시/군/구 코드
     city_name VARCHAR(100) NOT NULL,             -- 시/군/구 이름
-    town_name VARCHAR(100)                       -- 읍/면/동 이름
+    town_name VARCHAR(100),                      -- 읍/면/동 이름
+    UNIQUE (province_code, city_code, town_name) -- 복합 고유 키로 중복 방지
 );
+
 ```
 
 ---
