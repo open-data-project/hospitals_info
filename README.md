@@ -1,11 +1,12 @@
 
 # 데이터베이스 스키마 설계
-
+1.병원정보서비스 2024.9.xlsx -> hospital_data.xlsx
+5.의료기관별상세정보서비스_03_진료과목정보 2024.9.xlsx -> detail_info_data.xlsx
 ## 1. 병원 정보 테이블 (`hospitals`)
 
 | **컬럼명 (영어)**    | **데이터 타입** | **제약 조건**                    | **설명 (한국어)**            |
 |---------------------|----------------|----------------------------------|-----------------------------|
-| `encrypted_code`    | VARCHAR(100)   | PRIMARY KEY                     | 병원의 고유 ID (암호화요양기호) |
+| `encrypted_code`    | VARCHAR(255)   | PRIMARY KEY                     | 병원의 고유 ID (암호화요양기호) |
 | `name`              | VARCHAR(255)  | NOT NULL                        | 병원 이름                   |
 | `address`           | TEXT          | NOT NULL                        | 병원의 상세 주소            |
 | `phone_number`      | VARCHAR(50)   | NULLABLE                        | 병원의 전화번호             |
@@ -59,7 +60,7 @@ CREATE TABLE regions (
 | **컬럼명 (영어)**    | **데이터 타입** | **제약 조건**                    | **설명 (한국어)**            |
 |---------------------|----------------|----------------------------------|-----------------------------|
 | `id`               | INT           | PRIMARY KEY, AUTO_INCREMENT      | 진료 과목 고유 ID           |
-| `encrypted_code`    | VARCHAR(50)   | FOREIGN KEY REFERENCES hospitals(encrypted_code) | 병원 고유 ID (암호화요양기호) |
+| `encrypted_code`    | VARCHAR(255)   | FOREIGN KEY REFERENCES hospitals(encrypted_code) | 병원 고유 ID (암호화요양기호) |
 | `specialty_code`    | VARCHAR(10)   | NOT NULL                        | 진료 과목 코드              |
 | `specialty_name`    | VARCHAR(255)  | NOT NULL                        | 진료 과목 이름              |
 | `specialist_count`  | INT           | DEFAULT 0                       | 해당 과목의 전문의 수       |
@@ -67,7 +68,7 @@ CREATE TABLE regions (
 ```sql
 CREATE TABLE specialties (
     id INT PRIMARY KEY AUTO_INCREMENT,           -- 진료 과목 고유 ID
-    encrypted_code VARCHAR(50),                  -- 병원 고유 ID (암호화요양기호)
+    encrypted_code VARCHAR(255),                 -- 병원 고유 ID (암호화요양기호)
     specialty_code VARCHAR(10) NOT NULL,         -- 진료 과목 코드
     specialty_name VARCHAR(255) NOT NULL,        -- 진료 과목 이름
     specialist_count INT DEFAULT 0,              -- 해당 과목의 전문의 수
