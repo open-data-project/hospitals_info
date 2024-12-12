@@ -5,7 +5,7 @@
 
 | **컬럼명 (영어)**    | **데이터 타입** | **제약 조건**                    | **설명 (한국어)**            |
 |---------------------|----------------|----------------------------------|-----------------------------|
-| `encrypted_code`    | VARCHAR(50)   | PRIMARY KEY                     | 병원의 고유 ID (암호화요양기호) |
+| `encrypted_code`    | VARCHAR(100)   | PRIMARY KEY                     | 병원의 고유 ID (암호화요양기호) |
 | `name`              | VARCHAR(255)  | NOT NULL                        | 병원 이름                   |
 | `address`           | TEXT          | NOT NULL                        | 병원의 상세 주소            |
 | `phone_number`      | VARCHAR(50)   | NULLABLE                        | 병원의 전화번호             |
@@ -15,7 +15,7 @@
 
 ```sql
 CREATE TABLE hospitals (
-    encrypted_code VARCHAR(50) PRIMARY KEY,       -- 병원의 고유 ID (암호화요양기호)
+    encrypted_code VARCHAR(100) PRIMARY KEY,       -- 병원의 고유 ID (암호화요양기호)
     name VARCHAR(255) NOT NULL,                  -- 병원 이름
     address TEXT NOT NULL,                       -- 병원의 상세 주소
     phone_number VARCHAR(50),                    -- 병원의 전화번호
