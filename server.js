@@ -8,7 +8,7 @@ const PORT = 5000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json()); 
 
 // SQLite 데이터베이스 연결
 const db = new sqlite3.Database('./hospital_data.db', err => {
