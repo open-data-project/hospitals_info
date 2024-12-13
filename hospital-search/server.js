@@ -15,18 +15,18 @@ const db = new sqlite3.Database('./hospital.db', err => {
     console.error('Error opening database:', err);
   } else {
     console.log('Connected to SQLite database.');
-    db.run(
-      `CREATE TABLE IF NOT EXISTS hospitals (
-       id INTEGER PRIMARY KEY AUTOINCREMENT,
-       name TEXT NOT NULL,
-       address TEXT NOT NULL
-     )`,
-      err => {
-        if (err) {
-          console.error('Error creating table:', err);
-        }
-      }
-    );
+    // db.run(
+    //   `CREATE TABLE IF NOT EXISTS hospitals (
+    //    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //    name TEXT NOT NULL,
+    //    address TEXT NOT NULL
+    //  )`,
+    //   err => {
+    //     if (err) {
+    //       console.error('Error creating table:', err);
+    //     }
+    //   }
+    // );
   }
 });
 
