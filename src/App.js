@@ -6,7 +6,8 @@ function App() {
   const [specialty, setSpecialty] = useState('');
   const [hospitals, setHospitals] = useState([]);
   const [showTooltip, setShowTooltip] = useState(null);
-  
+  const [hospitalName, setHospitalName] = useState('');
+
   const handleMouseEnter = (index) => {
     setShowTooltip(index);  // 해당 병원의 툴팁을 표시
   };
@@ -172,6 +173,7 @@ function App() {
     if (province) query += `province_name=${province}&`;
     if (city) query += `city_name=${city}&`;
     if (specialty) query += `specialty_name=${specialty}`;
+    if (hospitalName) query += `hospital_name=${hospitalName}`; 
     console.log(query);
     
     // 쿼리 파라미터가 있으면 API 요청
@@ -191,7 +193,9 @@ function App() {
       <h1 style={{ textAlign: 'center' }}>병원 찾기🏥</h1>
 
       <div style={{ marginBottom: '20px', fontSize: '30px'}}>
+
         <label style={{ marginLeft: '10px', fontSize: '30px' }}>
+
           <strong style={{ marginLeft: '10px', fontSize: '30px' }}>지역:</strong>
           <select value={province} onChange={(e) => setProvince(e.target.value)} style={{ fontSize: '30px', padding: '3px' }} >
             <option value="">전체</option>            
@@ -282,7 +286,16 @@ function App() {
             {/* 다른 진료 과목 옵션 추가 */}
           </select>
         </label>
-
+        <label style={{ marginLeft: '10px', fontSize: '30px' }}>
+        
+        <input
+          type="text"
+          value={hospitalName}
+          onChange={(e) => setHospitalName(e.target.value)}
+          style={{ fontSize: '30px', padding: '5px', marginLeft: '10px' }}
+          placeholder="병원명 입력"
+        />
+      </label>
         <button 
           onClick={handleSearch} 
           style={{ padding: '5px', marginLeft: '15px', fontSize: '25px' }}

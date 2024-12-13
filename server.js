@@ -92,9 +92,9 @@ app.get('/api/favorites', (req, res) => {
   });
 });
 
-// 지역, 진료과목 조건을 포함한 병원 검색 API
+// 병원 검색 API (이름, 지역, 진료 과목 포함)
 app.get('/api/hospitals', (req, res) => {
-  const { province_name, city_name, specialty_name } = req.query;
+  const { hospital_name, province_name, city_name, specialty_name } = req.query;
 
   let query = `
     SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
@@ -105,21 +105,27 @@ app.get('/api/hospitals', (req, res) => {
     LEFT JOIN specialties s ON h.encrypted_code = s.encrypted_code
     WHERE 1=1
   `;
+
   const params = [];
 
-  // province_name 파라미터가 있으면 조건 추가
+  // 병원 이름 조건 추가
+  if (hospital_name) {
+    query += ' AND h.name LIKE ?';
+    params.push(`%${hospital_name}%`);
+  }
+
+  // 지역 조건 추가
   if (province_name) {
     query += ' AND r.province_name = ?';
     params.push(province_name);
   }
 
-  // city_name 파라미터가 있으면 조건 추가
   if (city_name) {
     query += ' AND r.city_name = ?';
     params.push(city_name);
   }
 
-  // specialty_name 파라미터가 있으면 조건 추가 및 specialists > 0
+  // 진료 과목 조건 추가
   if (specialty_name) {
     query += ' AND s.specialty_name = ? AND s.specialist_count > 0';
     params.push(specialty_name);
@@ -129,7 +135,7 @@ app.get('/api/hospitals', (req, res) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.json(rows); // 병원 목록 반환
+      res.json(rows); // 검색 결과 반환
     }
   });
 });
