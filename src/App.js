@@ -5,6 +5,16 @@ function App() {
   const [city, setCity] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [hospitals, setHospitals] = useState([]);
+  const [showTooltip, setShowTooltip] = useState(null);
+  
+  const handleMouseEnter = (index) => {
+    setShowTooltip(index);  // 해당 병원의 툴팁을 표시
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(null);  // 툴팁 숨기기
+  };
+
 
   const cityOptions = {
     부산: [
@@ -84,10 +94,6 @@ function App() {
       '보령시', '공주시', '홍성군', '금산군', '계룡시', '서천군', '부여군', '청양군', 
       '태안군'
     ],
-    전남: [
-      '익산시', '전주덕진구', '부안군', '군산시', '고창군', '전주완산구', '정읍시', 
-      '남원시', '김제시', '진안군', '임실군', '완주군', '순창군', '무주군', '장수군'
-    ],
     충북: ['청주서원구', '충주시', '진천군', '제천시', '청주상당구', '옥천군', '청주흥덕구',
       '청주청원구', '음성군', '괴산군', '보은군', '영동군', '단양군', '증평군'],
     울산: ['울산동구', '울산울주군', '울산남구', '울산북구', '울산중구'],
@@ -159,6 +165,7 @@ function App() {
 
 
 
+
   // 검색 버튼 클릭 시 API 호출
   const handleSearch = () => {
     let query = '';
@@ -175,6 +182,9 @@ function App() {
         .catch(error => console.error('Error fetching hospitals:', error));
     }
   };
+
+  console.log(hospitals);
+  
 
   return (
     <div style={{ padding: '20px', backgroundColor: 'white', height: '100vh',fontSize: '40px' }}>
@@ -288,10 +298,34 @@ function App() {
                 border: '1px solid black',
                 padding: '10px',
                 marginBottom: '10px',
+                position: 'relative',  
               }}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
             >
               <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
-              <p style={{ margin: '0', fontSize: '14px' }}>{hospital.address}</p>
+              <p style={{ margin: '0', fontSize: '14px' }}>{hospital.specialty_name}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',  
+                  left: '0',    
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  zIndex: 1000,
+                  display: showTooltip === index ? 'block' : 'none',
+                }}
+              >
+                <div>
+                  <h4 style={{fontSize:'20px'}}>{hospital.name}</h4>
+                  <p style={{fontSize:'20px'}}>주소: {hospital.address}</p>
+                  <p style={{fontSize:'20px'}}>전화: {hospital.phone_number}</p>
+                  <p style={{fontSize:'20px'}}>진료 과목: {hospital.specialty_name}</p>
+                  <p style={{fontSize:'20px'}}>전문의 수: {hospital.total_doctors}</p>
+                </div>               
+              </div>
             </div>
           ))
         ) : (
