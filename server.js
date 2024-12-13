@@ -81,7 +81,7 @@ app.get('/api/hospitals', (req, res) => {
   }
 
   if (specialty_name) {
-    query += ' AND s.specialty_name = ?';
+    query += ' AND s.specialty_name = ? AND s.specialist_count > 0';
     params.push(specialty_name);
   }
 
@@ -94,25 +94,46 @@ app.get('/api/hospitals', (req, res) => {
   });
 });
 
-// 병원 상세 정보 API
+// 병원 상세 정보 및 해당 병원의 모든 진료과목과 전문의 수 조회 API
 app.get('/api/hospitals/:id', (req, res) => {
   const { id } = req.params;
 
+  // 병원 상세 정보와 해당 병원의 진료과목 정보 조회
   const query = `
     SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
-           r.province_name, r.city_name, r.town_name
+           r.province_name, r.city_name, r.town_name,
+           s.specialty_name, s.specialist_count
     FROM hospitals h
     INNER JOIN regions r ON h.region_id = r.id
+    LEFT JOIN specialties s ON h.encrypted_code = s.encrypted_code
     WHERE h.encrypted_code = ?
   `;
 
-  db.get(query, [id], (err, row) => {
+  db.all(query, [id], (err, rows) => {
     if (err) {
       res.status(500).send(err.message);
-    } else if (!row) {
+    } else if (!rows || rows.length === 0) {
       res.status(404).send({ error: "Hospital not found" });
     } else {
-      res.json(row);
+      const hospitalInfo = {
+        hospital: {
+          encrypted_code: rows[0].encrypted_code,
+          name: rows[0].name,
+          address: rows[0].address,
+          phone_number: rows[0].phone_number,
+          total_doctors: rows[0].total_doctors,
+          specialists: rows[0].specialists,
+          province_name: rows[0].province_name,
+          city_name: rows[0].city_name,
+          town_name: rows[0].town_name
+        },
+        specialties: rows.map(row => ({
+          specialty_name: row.specialty_name,
+          specialist_count: row.specialist_count
+        }))
+      };
+
+      res.json(hospitalInfo);
     }
   });
 });
