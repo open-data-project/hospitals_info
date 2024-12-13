@@ -1,44 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-  const [search, setSearch] = useState('');
-  const hospitals = [
-    { name: 'Seoul Hospital', address: '123 Main St' },
-    { name: 'Busan Clinic', address: '456 Ocean Rd' },
-    { name: 'Daegu Medical Center', address: '789 Forest Ln' },
-  ];
+  const [hospitals, setHospitals] = useState([]);
+  const [page, setPage] = useState(1);
 
-  const filteredHospitals = hospitals.filter(hospital =>
-    hospital.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/hospitals?page=${page}`)
+      .then(response => response.json())
+      .then(data => {
+        setHospitals(prevHospitals => [...prevHospitals, ...data]);
+  })
+      .catch(error => console.error('Error fetching hospitals:', error));
+  }, [page]);
+
+  console.log(hospitals);
+
+  const nextpage = () => {
+    setPage(prevPage => prevPage + 1);
+  };
 
   return (
     <div style={{ padding: '20px', backgroundColor: 'white', height: '100vh' }}>
-      <h1 style={{ textAlign: 'center' }}>병원 검색</h1>
-      <input
-        type="text"
-        placeholder="병원 이름 검색"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ padding: '10px', marginBottom: '20px', fontSize: '16px' }}
-      />
+      <h1 style={{textAlign: 'center'}}>병원 검색</h1>
       <div>
-        {filteredHospitals.map((hospital, index) => (
+        {hospitals.map((hospital, index) => (
           <div
             key={index}
             style={{
-              border: '1px solid black',
-              padding: '10px',
-              marginBottom: '10px',
-            }}
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '15px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
           >
-            <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
-            <p style={{ margin: '0', fontSize: '14px' }}>{hospital.address}</p>
+            <h2 style={{ margin: '0', fontSize: '18px', color: '#333' }}>{hospital.name}</h2>
+            <p style={{ margin: '0', fontSize: '14px', color: '#555' }}>{hospital.address}</p>
           </div>
         ))}
+  
       </div>
+      <button
+        onClick={nextpage}
+        style={{
+          display: 'block',
+          width: '100%',
+          padding: '10px',
+          marginTop: '20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          fontSize: '16px',
+          cursor: 'pointer',
+        }}
+      >
+        더 보기
+      </button>
     </div>
   );
 }
-
+ 
 export default App;
