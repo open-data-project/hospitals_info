@@ -98,8 +98,7 @@ app.get('/api/hospitals', (req, res) => {
 
   let query = `
     SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
-           r.province_name, r.city_name, r.town_name,
-           s.specialty_name, s.specialist_count
+           r.province_name, r.city_name, r.town_name
     FROM hospitals h
     INNER JOIN regions r ON h.region_id = r.id
     LEFT JOIN specialties s ON h.encrypted_code = s.encrypted_code
@@ -130,6 +129,8 @@ app.get('/api/hospitals', (req, res) => {
     query += ' AND s.specialty_name = ? AND s.specialist_count > 0';
     params.push(specialty_name);
   }
+
+  query += ` GROUP BY h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists, r.province_name, r.city_name, r.town_name`;
 
   db.all(query, params, (err, rows) => {
     if (err) {
