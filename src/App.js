@@ -188,7 +188,7 @@ function App() {
 
   return (
     <div style={{ padding: '20px', backgroundColor: 'white', height: '100vh',fontSize: '40px' }}>
-      <h1 style={{ textAlign: 'center' }}>병원 검색</h1>
+      <h1 style={{ textAlign: 'center' }}>병원 찾기🏥</h1>
 
       <div style={{ marginBottom: '20px', fontSize: '30px'}}>
         <label style={{ marginLeft: '10px', fontSize: '30px' }}>
@@ -319,11 +319,11 @@ function App() {
                 }}
               >
                 <div>
-                  <h4 style={{fontSize:'20px'}}>{hospital.name}</h4>
-                  <p style={{fontSize:'20px'}}>주소: {hospital.address}</p>
-                  <p style={{fontSize:'20px'}}>전화: {hospital.phone_number}</p>
-                  <p style={{fontSize:'20px'}}>진료 과목: {hospital.specialty_name}</p>
-                  <p style={{fontSize:'20px'}}>전문의 수: {hospital.total_doctors}</p>
+                  <h4 style={{fontSize:'20px'}}>🏥{hospital.name}</h4>
+                  <p style={{fontSize:'20px'}}>🚩주소: {hospital.address}</p>
+                  <p style={{fontSize:'20px'}}>📞전화: {hospital.phone_number}</p>
+                  <p style={{fontSize:'20px'}}>💉진료 과목: {hospital.specialty_name}</p>
+                  <p style={{fontSize:'20px'}}>🧑‍⚕️전문의 수: {hospital.total_doctors}</p>
                 </div>               
               </div>
             </div>
