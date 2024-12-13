@@ -7,7 +7,7 @@ const app = express();
 const PORT = 5000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json()); 
 
 // SQLite 데이터베이스 초기화
 const db = new sqlite3.Database('./hospital.db', err => {
