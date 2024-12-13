@@ -55,6 +55,43 @@ app.post('/api/specialties', (req, res) => {
   });
 });
 
+// 즐겨찾기 병원 추가 API
+app.post('/api/favorites', (req, res) => {
+  const { hospitalId } = req.body;
+
+  const query = `
+    INSERT INTO favorites (hospital_id)
+    VALUES (?)
+  `;
+
+  db.run(query, [hospitalId], function (err) {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(201).send({ message: 'Hospital added to favorites' });
+    }
+  });
+});
+
+// 즐겨찾기 병원 목록 조회 API
+app.get('/api/favorites', (req, res) => {
+  const query = `
+    SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
+           r.province_name, r.city_name, r.town_name
+    FROM hospitals h
+    INNER JOIN favorites f ON h.encrypted_code = f.hospital_id
+    INNER JOIN regions r ON h.region_id = r.id
+  `;
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.json(rows); // 즐겨찾기한 병원 목록 반환
+    }
+  });
+});
+
 // 지역, 진료과목 조건을 포함한 병원 검색 API
 app.get('/api/hospitals', (req, res) => {
   const { province_name, city_name, specialty_name } = req.query;
@@ -70,16 +107,19 @@ app.get('/api/hospitals', (req, res) => {
   `;
   const params = [];
 
+  // province_name 파라미터가 있으면 조건 추가
   if (province_name) {
     query += ' AND r.province_name = ?';
     params.push(province_name);
   }
 
+  // city_name 파라미터가 있으면 조건 추가
   if (city_name) {
     query += ' AND r.city_name = ?';
     params.push(city_name);
   }
 
+  // specialty_name 파라미터가 있으면 조건 추가 및 specialists > 0
   if (specialty_name) {
     query += ' AND s.specialty_name = ? AND s.specialist_count > 0';
     params.push(specialty_name);
@@ -89,7 +129,7 @@ app.get('/api/hospitals', (req, res) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.json(rows);
+      res.json(rows); // 병원 목록 반환
     }
   });
 });
@@ -98,7 +138,6 @@ app.get('/api/hospitals', (req, res) => {
 app.get('/api/hospitals/:id', (req, res) => {
   const { id } = req.params;
 
-  // 병원 상세 정보와 해당 병원의 진료과목 정보 조회
   const query = `
     SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
            r.province_name, r.city_name, r.town_name,
