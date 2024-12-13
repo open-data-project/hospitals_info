@@ -87,6 +87,7 @@ app.get('/api/hospitals', (req, res) => {
 
   db.all(query, params, (err, rows) => {
     if (err) {
+      console.error('Database error: ', err);
       res.status(500).send(err.message);
     } else {
       res.json(rows);
