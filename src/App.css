@@ -28,6 +28,10 @@
   color: #61dafb;
 }
 
+div:hover .tooltip {
+  display: block;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

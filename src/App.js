@@ -5,6 +5,17 @@ function App() {
   const [city, setCity] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [hospitals, setHospitals] = useState([]);
+  const [showTooltip, setShowTooltip] = useState(null);
+  const [hospitalName, setHospitalName] = useState('');
+
+  const handleMouseEnter = (index) => {
+    setShowTooltip(index);  // 해당 병원의 툴팁을 표시
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(null);  // 툴팁 숨기기
+  };
+
 
   const cityOptions = {
     부산: [
@@ -176,6 +187,9 @@ function App() {
     }
   };
 
+  console.log(hospitals);
+  
+
   return (
     <div style={{ padding: '20px', backgroundColor: 'white', height: '100vh',fontSize: '40px' }}>
       <h1 style={{ textAlign: 'center' }}>병원 검색</h1>
@@ -277,6 +291,10 @@ function App() {
           onClick={handleSearch} 
           style={{ padding: '5px', marginLeft: '15px', fontSize: '25px' }}
         >검색</button>
+        <button 
+          onClick={handleSearch} 
+          style={{ padding: '5px', marginLeft: '15px', fontSize: '25px', background: 'rgba(211, 188, 250, 0.5)' }}
+        >즐겨찾기</button>
       </div>
 
       <div>
@@ -291,7 +309,28 @@ function App() {
               }}
             >
               <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
-              <p style={{ margin: '0', fontSize: '14px' }}>{hospital.address}</p>
+              <p style={{ margin: '0', fontSize: '14px' }}>{hospital.specialty_name}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',  
+                  left: '0',    
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  zIndex: 1000,
+                  display: showTooltip === index ? 'block' : 'none',
+                }}
+              >
+                <div>
+                  <h4 style={{fontSize:'20px'}}>🏥{hospital.name}</h4>
+                  <p style={{fontSize:'20px'}}>🚩주소: {hospital.address}</p>
+                  <p style={{fontSize:'20px'}}>📞전화: {hospital.phone_number}</p>
+                  <p style={{fontSize:'20px'}}>💉진료 과목: {hospital.specialty_name}</p>
+                  <p style={{fontSize:'20px'}}>🧑‍⚕️전문의 수: {hospital.total_doctors}</p>
+                </div>               
+              </div>
             </div>
           ))
         ) : (
