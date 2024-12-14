@@ -5,7 +5,6 @@ function App() {
   const [city, setCity] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [hospitals, setHospitals] = useState([]);
-  const [showTooltip, setShowTooltip] = useState(null);
   const [hospitalName, setHospitalName] = useState('');
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [favorites, setFavorites] = useState([]); // 즐겨찾기 목록
@@ -84,13 +83,6 @@ function App() {
   };
 
 
-  const handleMouseEnter = (index) => {
-    setShowTooltip(index);  // 해당 병원의 툴팁을 표시
-  };
-
-  const handleMouseLeave = () => {
-    setShowTooltip(null);  // 툴팁 숨기기
-  };
 
   const handleAddToFavorites = async (hospitalId) => {
     try {
@@ -456,7 +448,7 @@ function App() {
                         }
                       </p>
                     )}
-                    <button onClick={toggleSpecialties} style={{ padding: '5px 10px', background: '#ddd', fontSize: '16px', backgroundColor: 'rgba(255, 182, 193, 0.5)', border: 'none', borderRadius: '5px'}} 
+                    <button onClick={toggleSpecialties} style={{ marginRight: '5px', padding: '5px 10px', background: '#ddd', fontSize: '16px', backgroundColor: 'rgba(255, 182, 193, 0.5)', border: 'none', borderRadius: '5px'}} 
                     onMouseEnter={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.8)'}
                     onMouseLeave={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.5)'}>
                       {showSpecialties ? '숨기기' : '전문 분야 보기'}
@@ -516,9 +508,9 @@ function App() {
                 background: expandedIndex === index ? '#f9f9f9' : '#fff',
               }}
             >
-              <h2>{hospital.name}</h2>
-              <p>{hospital.address}</p>
-              <button onClick={() => toggleDetails(hospital.encrypted_code, index)}>
+              <h2 style={{fontSize: '20px'}}>{hospital.name}</h2>
+              <p style={{fontSize: '18px'}}>{hospital.address}</p>
+              <button style={{marginRight: '5px', background: 'rgba(255, 182, 193, 0.8)', borderRadius: '5px',}} onClick={() => toggleDetails(hospital.encrypted_code, index)} >
                 {expandedIndex === index ? '닫기' : '상세보기'}
               </button>
 
@@ -543,6 +535,7 @@ function App() {
                   e.stopPropagation();
                   handleAddToFavorites(hospital.encrypted_code);
                 }}
+                style={{background: 'rgba(211, 188, 250, 0.5)', borderRadius: '5px'}}
               >
                 즐겨찾기 추가
               </button>
