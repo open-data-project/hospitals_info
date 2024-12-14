@@ -76,21 +76,58 @@ app.post('/api/favorites', (req, res) => {
 // 즐겨찾기 병원 목록 조회 API
 app.get('/api/favorites', (req, res) => {
   const query = `
-    SELECT h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists,
-           r.province_name, r.city_name, r.town_name
+    SELECT 
+      h.encrypted_code, 
+      h.name, 
+      h.address, 
+      h.phone_number, 
+      h.total_doctors, 
+      h.specialists,
+      r.province_name, 
+      r.city_name, 
+      r.town_name,
+      GROUP_CONCAT(s.specialty_name) AS specialties, -- 병원 진료 과목을 하나의 문자열로 결합
+      GROUP_CONCAT(s.specialist_count) AS specialist_counts -- 진료 과목별 전문의 수를 하나의 문자열로 결합
     FROM hospitals h
     INNER JOIN favorites f ON h.encrypted_code = f.hospital_id
     INNER JOIN regions r ON h.region_id = r.id
+    LEFT JOIN specialties s ON h.encrypted_code = s.encrypted_code
+    GROUP BY h.encrypted_code, h.name, h.address, h.phone_number, h.total_doctors, h.specialists, r.province_name, r.city_name, r.town_name
   `;
 
   db.all(query, [], (err, rows) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.json(rows); // 즐겨찾기한 병원 목록 반환
+      const formattedRows = rows.map(row => {
+        const specialtiesArray = row.specialties ? row.specialties.split(',') : [];
+        const specialistCountsArray = row.specialist_counts ? row.specialist_counts.split(',').map(Number) : [];
+
+        // Combine specialties and specialist counts into [["진료 과목", 전문의 수], ...] format
+        const combinedSpecialties = specialtiesArray.map((specialty, index) => [
+          specialty,
+          specialistCountsArray[index] || 0
+        ]);
+
+        return {
+          encrypted_code: row.encrypted_code,
+          name: row.name,
+          address: row.address,
+          phone_number: row.phone_number,
+          total_doctors: row.total_doctors,
+          specialists: row.specialists,
+          province_name: row.province_name,
+          city_name: row.city_name,
+          town_name: row.town_name,
+          specialties: combinedSpecialties // Combined data
+        };
+      });
+
+      res.json(formattedRows); // 변환된 데이터를 반환
     }
   });
 });
+
 
 // 병원 검색 API (이름, 지역, 진료 과목 포함)
 app.get('/api/hospitals', (req, res) => {
