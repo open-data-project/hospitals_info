@@ -9,7 +9,33 @@ function App() {
   const [hospitalName, setHospitalName] = useState('');
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [favorites, setFavorites] = useState([]); // 즐겨찾기 목록
+  const [expandedIndex, setExpandedIndex] = useState(null); // 클릭된 병원 인덱스
+  const [hospitalDetails, setHospitalDetails] = useState(null); // 병원 상세 정보 저장
 
+
+  const toggleDetails = (hospitalId, index) => {
+    if (expandedIndex === index) {
+      setExpandedIndex(null); // 현재 병원 닫기
+    } else {
+      fetchHospitalDetails(hospitalId, index); // 새로운 병원 데이터 가져오기
+    }
+  };
+  
+
+  const fetchHospitalDetails = async (hospitalId, index) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/hospitals/${hospitalId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setHospitalDetails(data); // 상세 정보 저장
+        setExpandedIndex(index); // 확장된 병원의 인덱스 업데이트
+      } else {
+        console.error('Failed to fetch hospital details');
+      }
+    } catch (error) {
+      console.error('Error fetching hospital details:', error);
+    }
+  };
   const fetchFavorites = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/favorites'); // API 호출
@@ -435,52 +461,46 @@ function App() {
               key={index}
               style={{
                 border: '1px solid black',
-                padding: '10px',
                 marginBottom: '10px',
-                position: 'relative',  
+                padding: '10px',
+                borderRadius: '5px',
+                background: expandedIndex === index ? '#f9f9f9' : '#fff',
               }}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
             >
-              <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
-              <button
-              style={{
-                  marginTop: '10px',
-                  padding: '5px 10px',
-                  background: 'rgba(211, 188, 250, 0.5)',
-                  cursor: 'pointer',
-                }}
-                onClick={() => handleAddToFavorites(hospital.encrypted_code)}
-              >
-              즐겨찾기 추가
+              <h2>{hospital.name}</h2>
+              <p>{hospital.address}</p>
+              <button onClick={() => toggleDetails(hospital.encrypted_code, index)}>
+                {expandedIndex === index ? '닫기' : '상세보기'}
               </button>
 
-              
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',  
-                  left: '0',    
-                  background: 'rgba(0, 0, 0, 0.7)',
-                  color: 'white',
-                  padding: '10px',
-                  borderRadius: '5px',
-                  zIndex: 1000,
-                  display: showTooltip === index ? 'block' : 'none',
+              {expandedIndex === index &&
+                hospitalDetails &&
+                hospitalDetails.hospital.encrypted_code === hospital.encrypted_code && (
+                  <div>
+                    <p>📞 전화번호: {hospitalDetails.hospital.phone_number}</p>
+                    <h4>진료 과목</h4>
+                    <ul>
+                      {hospitalDetails.specialties.map((specialty, i) => (
+                        <li key={i}>
+                          {specialty.specialty_name} - {specialty.specialist_count}명
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToFavorites(hospital.encrypted_code);
                 }}
               >
-                <div>
-                  <h4 style={{fontSize:'20px'}}>🏥{hospital.name}</h4>
-                  <p style={{fontSize:'20px'}}>🚩주소: {hospital.address}</p>
-                  <p style={{fontSize:'20px'}}>📞전화: {hospital.phone_number}</p>
-                  <p style={{fontSize:'20px'}}>💉전체 의사 수: {hospital.total_doctors}</p>
-                  <p style={{fontSize:'20px'}}>🧑‍⚕️전문의 수: {hospital.specialists}</p>
-                </div>               
-              </div>
+                즐겨찾기 추가
+              </button>
             </div>
           ))
         ) : (
-          <p style={{ fontSize: '20px', padding: '30px' }}>검색된 병원이 없습니다.</p>
+          <p>검색된 병원이 없습니다.</p>
         )}
       </div>
     </div>
