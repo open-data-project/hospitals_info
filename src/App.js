@@ -518,11 +518,11 @@ function App() {
                 hospitalDetails &&
                 hospitalDetails.hospital.encrypted_code === hospital.encrypted_code && (
                   <div>
-                    <p>📞 전화번호: {hospitalDetails.hospital.phone_number}</p>
-                    <h4>진료 과목</h4>
+                    <p style={{fontSize: '18px'}}>📞 전화번호: {hospitalDetails.hospital.phone_number}</p>
+                    <h4 style={{fontSize: '18px'}}>진료 과목</h4>
                     <ul>
                       {hospitalDetails.specialties.map((specialty, i) => (
-                        <li key={i}>
+                        <li style={{fontSize: '18px'}} key={i}>
                           {specialty.specialty_name} - {specialty.specialist_count}명
                         </li>
                       ))}
