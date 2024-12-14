@@ -16,6 +16,29 @@ function App() {
     setShowTooltip(null);  // 툴팁 숨기기
   };
 
+  const handleAddToFavorites = async (encrypted_code) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/favorites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ encrypted_code }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data); 
+        alert('즐겨찾기에 추가되었습니다.'); // "Hospital added to favorites" 메시지 출력
+      } else {
+        alert('즐겨찾기 추가 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      alert('즐겨찾기 추가 중 오류가 발생했습니다.');
+    }
+  };
+
 
   const cityOptions = {
     부산: [
@@ -185,7 +208,6 @@ function App() {
     }
   };
 
-  console.log(hospitals);
   
 
   return (
@@ -300,6 +322,10 @@ function App() {
           onClick={handleSearch} 
           style={{ padding: '5px', marginLeft: '15px', fontSize: '25px' }}
         >검색</button>
+        <button 
+          onClick={handleSearch} 
+          style={{ padding: '5px', marginLeft: '15px', fontSize: '25px', background: 'rgba(211, 188, 250, 0.5)' }}
+        >즐겨찾기</button>
       </div>
 
       <div>
@@ -318,6 +344,18 @@ function App() {
             >
               <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
               <p style={{ margin: '0', fontSize: '14px' }}>{hospital.specialty_name}</p>
+              <button
+              style={{
+                  marginTop: '10px',
+                  padding: '5px 10px',
+                  background: 'rgba(211, 188, 250, 0.5)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handleAddToFavorites(hospital.encrypted_code)}
+              >
+              즐겨찾기 추가
+              </button>
+              
               <div
                 style={{
                   position: 'absolute',
@@ -335,8 +373,8 @@ function App() {
                   <h4 style={{fontSize:'20px'}}>🏥{hospital.name}</h4>
                   <p style={{fontSize:'20px'}}>🚩주소: {hospital.address}</p>
                   <p style={{fontSize:'20px'}}>📞전화: {hospital.phone_number}</p>
-                  <p style={{fontSize:'20px'}}>💉진료 과목: {hospital.specialty_name}</p>
-                  <p style={{fontSize:'20px'}}>🧑‍⚕️전문의 수: {hospital.total_doctors}</p>
+                  <p style={{fontSize:'20px'}}>💉전체 의사 수: {hospital.total_doctors}</p>
+                  <p style={{fontSize:'20px'}}>🧑‍⚕️전문의 수: {hospital.specialists}</p>
                 </div>               
               </div>
             </div>
