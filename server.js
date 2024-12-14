@@ -104,10 +104,9 @@ app.get('/api/favorites', (req, res) => {
         const specialistCountsArray = row.specialist_counts ? row.specialist_counts.split(',').map(Number) : [];
 
         // Combine specialties and specialist counts into [["진료 과목", 전문의 수], ...] format
-        const combinedSpecialties = specialtiesArray.map((specialty, index) => [
-          specialty,
-          specialistCountsArray[index] || 0
-        ]);
+        const combinedSpecialties = specialtiesArray
+          .map((specialty, index) => [specialty, specialistCountsArray[index] || 0])
+          .filter(([_, count]) => count > 0); // Filter out specialties with 0 specialist_count
 
         return {
           encrypted_code: row.encrypted_code,
@@ -119,7 +118,7 @@ app.get('/api/favorites', (req, res) => {
           province_name: row.province_name,
           city_name: row.city_name,
           town_name: row.town_name,
-          specialties: combinedSpecialties // Combined data
+          specialties: combinedSpecialties // Only specialties with >0 specialists
         };
       });
 
