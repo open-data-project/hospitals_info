@@ -7,6 +7,35 @@ function App() {
   const [hospitals, setHospitals] = useState([]);
   const [showTooltip, setShowTooltip] = useState(null);
   const [hospitalName, setHospitalName] = useState('');
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부
+  const [favorites, setFavorites] = useState([]); // 즐겨찾기 목록
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/favorites'); // API 호출
+      if (response.ok) {
+        const data = await response.json();
+        setFavorites(data); // 즐겨찾기 목록 업데이트
+      } else {
+        console.error('Failed to fetch favorites');
+      }
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+    }
+  };
+
+  console.log(favorites);
+
+  const handleOpenModal = () => {
+    fetchFavorites(); // API 호출
+    setShowModal(true); // 모달 열기
+  };
+
+  // 모달 닫기
+  const handleCloseModal = () => {
+    setShowModal(false); // 모달 닫기
+  };
+
 
   const handleMouseEnter = (index) => {
     setShowTooltip(index);  // 해당 병원의 툴팁을 표시
@@ -16,14 +45,14 @@ function App() {
     setShowTooltip(null);  // 툴팁 숨기기
   };
 
-  const handleAddToFavorites = async (encrypted_code) => {
+  const handleAddToFavorites = async (hospitalId) => {
     try {
       const response = await fetch('http://localhost:5000/api/favorites', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ encrypted_code }),
+        body: JSON.stringify({ hospitalId }),
       });
 
       if (response.ok) {
@@ -323,9 +352,80 @@ function App() {
           style={{ padding: '5px', marginLeft: '15px', fontSize: '25px' }}
         >검색</button>
         <button 
-          onClick={handleSearch} 
+          onClick={handleOpenModal} 
           style={{ padding: '5px', marginLeft: '15px', fontSize: '25px', background: 'rgba(211, 188, 250, 0.5)' }}
         >즐겨찾기</button>
+
+        {showModal && (
+          <div
+            style={{
+              position: 'fixed',
+              top: '0',
+              left: '0',
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0, 0, 0, 0.7)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000,
+            }}
+            onClick={handleCloseModal} // 배경 클릭 시 모달 닫기
+          >
+            <div
+              style={{
+                width: '90%',
+                maxWidth: '600px',
+                background: 'white',
+                padding: '20px',
+                boxShadow: '0px 0px 10px rgba(0,0,0,0.3)',
+                overflowY: 'auto',  // 목록이 길어지면 스크롤
+                maxHeight: '60%',    // 모달 내용이 너무 길어지지 않게 최대 높이 설정
+              }}
+              onClick={(e) => e.stopPropagation()} // 모달 내 내용 클릭 시 모달 닫히지 않도록
+            >
+              <h3>즐겨찾기 목록</h3>
+              {favorites.length > 0 ? (
+                favorites.map((favorite, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      border: '1px solid gray',
+                      padding: '10px',
+                      marginBottom: '10px',
+                      borderRadius: '5px',
+                      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    <h4 style={{ fontSize: '20px', marginBottom: '10px' }}>{favorite.name}</h4>
+                    <p style={{ fontSize: '18px', margin: '5px 0' }}>주소: {favorite.address}</p>
+                    <p style={{ fontSize: '18px', margin: '5px 0' }}>전화: {favorite.phone_number}</p>
+                  </div>
+                ))
+              ) : (
+                <p>즐겨찾기 목록이 비어 있습니다.</p>
+              )}
+
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  marginTop: '20px',
+                  padding: '10px 20px',
+                  fontSize: '18px',
+                  background: 'rgba(211, 188, 250, 0.5)',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  transition: 'background 0.3s ease',
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(211, 188, 250, 0.8)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(211, 188, 250, 0.5)'}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div>
@@ -343,7 +443,6 @@ function App() {
               onMouseLeave={handleMouseLeave}
             >
               <h2 style={{ margin: '0', fontSize: '18px' }}>{hospital.name}</h2>
-              <p style={{ margin: '0', fontSize: '14px' }}>{hospital.specialty_name}</p>
               <button
               style={{
                   marginTop: '10px',
@@ -355,6 +454,7 @@ function App() {
               >
               즐겨찾기 추가
               </button>
+
               
               <div
                 style={{
