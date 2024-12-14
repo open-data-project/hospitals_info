@@ -9,6 +9,11 @@ function App() {
   const [hospitalName, setHospitalName] = useState('');
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [favorites, setFavorites] = useState([]); // 즐겨찾기 목록
+  const [showSpecialties, setShowSpecialties] = useState(false);
+
+  const toggleSpecialties = () => {
+    setShowSpecialties(prevState => !prevState);
+  };
 
   const fetchFavorites = async () => {
     try {
@@ -400,6 +405,20 @@ function App() {
                     <h4 style={{ fontSize: '20px', marginBottom: '10px' }}>{favorite.name}</h4>
                     <p style={{ fontSize: '18px', margin: '5px 0' }}>주소: {favorite.address}</p>
                     <p style={{ fontSize: '18px', margin: '5px 0' }}>전화: {favorite.phone_number}</p>
+                    {showSpecialties && (
+                      <p style={{ fontSize: '18px', margin: '5px 0' }}>
+                        전문 분야: {
+                          favorite.specialties
+                            .map((item, index) => (index === favorite.specialties.length - 1 ? item[0] : item[0] + ', '))
+                            .join('')
+                        }
+                      </p>
+                    )}
+                    <button onClick={toggleSpecialties} style={{ padding: '5px 10px', background: '#ddd', fontSize: '16px', backgroundColor: 'rgba(255, 182, 193, 0.5)', border: 'none', borderRadius: '5px'}} 
+                    onMouseEnter={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.5)'}>
+                      {showSpecialties ? '숨기기' : '전문 분야 보기'}
+                    </button>
                   </div>
                 ))
               ) : (
