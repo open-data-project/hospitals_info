@@ -9,9 +9,31 @@ function App() {
   const [hospitalName, setHospitalName] = useState('');
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [favorites, setFavorites] = useState([]); // 즐겨찾기 목록
+  const [showSpecialties, setShowSpecialties] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState(null); // 클릭된 병원 인덱스
   const [hospitalDetails, setHospitalDetails] = useState(null); // 병원 상세 정보 저장
+  const toggleSpecialties = () => {
+    setShowSpecialties(prevState => !prevState);
+  };
 
+  const handleRemoveFavorite = async (hospitalId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/favorites/${hospitalId}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        alert('즐겨찾기에서 삭제되었습니다!');
+        // 즐겨찾기 목록을 다시 불러오거나 목록에서 해당 항목 제거
+        fetchFavorites(); // 즐겨찾기 목록을 다시 가져오는 함수 
+      } else {
+        const data = await response.json();
+        alert(data.error || '즐겨찾기 삭제 실패');
+      }
+    } catch (error) {
+      console.error('Error deleting favorite:', error);
+    }
+  };
 
   const toggleDetails = (hospitalId, index) => {
     if (expandedIndex === index) {
@@ -50,7 +72,6 @@ function App() {
     }
   };
 
-  console.log(favorites);
 
   const handleOpenModal = () => {
     fetchFavorites(); // API 호출
@@ -426,10 +447,38 @@ function App() {
                     <h4 style={{ fontSize: '20px', marginBottom: '10px' }}>{favorite.name}</h4>
                     <p style={{ fontSize: '18px', margin: '5px 0' }}>주소: {favorite.address}</p>
                     <p style={{ fontSize: '18px', margin: '5px 0' }}>전화: {favorite.phone_number}</p>
+                    {showSpecialties && (
+                      <p style={{ fontSize: '18px', margin: '5px 0' }}>
+                        전문 분야: {
+                          favorite.specialties
+                            .map((item, index) => (index === favorite.specialties.length - 1 ? item[0] : item[0] + ', '))
+                            .join('')
+                        }
+                      </p>
+                    )}
+                    <button onClick={toggleSpecialties} style={{ padding: '5px 10px', background: '#ddd', fontSize: '16px', backgroundColor: 'rgba(255, 182, 193, 0.5)', border: 'none', borderRadius: '5px'}} 
+                    onMouseEnter={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.background = 'rgba(255, 182, 193, 0.5)'}>
+                      {showSpecialties ? '숨기기' : '전문 분야 보기'}
+                    </button>
+                    <button
+                      onClick={() => handleRemoveFavorite(favorite.encrypted_code)}
+                      style={{
+                        background: 'red',
+                        color: 'white',
+                        border: 'none',
+                        padding: '5px 10px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        borderRadius: '5px',
+                      }}
+                    >
+                      삭제
+                    </button>
                   </div>
                 ))
               ) : (
-                <p>즐겨찾기 목록이 비어 있습니다.</p>
+                <p style={{fontSize: '20px'}}>즐겨찾기 목록이 비어 있습니다.</p>
               )}
 
               <button

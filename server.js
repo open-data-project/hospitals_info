@@ -73,6 +73,26 @@ app.post('/api/favorites', (req, res) => {
   });
 });
 
+//즐겨찾기 병원 삭제 API
+app.delete('/api/favorites/:id', (req, res) => {
+  const { id } = req.params; // 즐겨찾기에서 삭제할 병원의 id를 받음
+
+  const query = `
+    DELETE FROM favorites WHERE hospital_id = ?
+  `;
+
+  db.run(query, [id], function (err) {
+    if (err) {
+      res.status(500).send(err.message);
+    } else if (this.changes === 0) {
+      res.status(404).send({ error: "Favorite not found" });
+    } else {
+      res.status(200).send({ message: 'Hospital removed from favorites' });
+    }
+  });
+});
+
+
 // 즐겨찾기 병원 목록 조회 API
 app.get('/api/favorites', (req, res) => {
   const query = `
